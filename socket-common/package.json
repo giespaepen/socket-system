@@ -1,0 +1,24 @@
+{
+  "name": "socket-common",
+  "version": "1.0.0",
+  "description": "Common code for the socket system",
+  "main": "dist/index.js",
+  "scripts": {
+    "build:dev": "tsc",
+    "build:watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "types": "dist/index.d.ts",
+  "author": "Gie Spaepen <giespaepen@outlook.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/redis": "^2.8.14",
+    "nodemon": "^1.19.3",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "redis": "^2.8.0",
+    "winston": "^3.2.1"
+  }
+}
