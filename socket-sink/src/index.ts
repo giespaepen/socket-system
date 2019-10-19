@@ -1,12 +1,11 @@
-import bodyParser from "body-parser";
 import express from "express";
 
 import { config } from "./config";
 import { SESSIONID_KEY } from "./constants";
 import { logger } from "./logging";
 import * as middleware from "./middleware";
-import { client } from "./redis";
-import { extractBody, extractPathVariable, failResponse, successResponse } from "./services";
+import { extractBody, extractPathVariable, failResponse, processMessage, successResponse } from "./services";
+
 
 logger.debug("Starting application");
 const app = express();
@@ -21,20 +20,13 @@ router.post(`/push/:${SESSIONID_KEY}`, (req, res) => {
         const sessionid = extractPathVariable(req, SESSIONID_KEY);
         const body = extractBody(req);
 
-        client.lpush(sessionid, body, (e) => {
-            if (!e) {
-                logger.debug(`Pushed to session ${sessionid}`);
-                client.expire(sessionid, 60);
-            } else {
-                res
-                    .status(500)
-                    .send(failResponse(e));
-            }
-        });
+        // Process the message
+        const result = processMessage(sessionid, body) ?
+            successResponse() : failResponse(`Cannot process message ${sessionid}`);
 
-        res
-            .status(200)
-            .send(successResponse());
+        // Send a response
+        res.status(result.success ? 200 : 500)
+            .send(result);
     } catch (e) {
         res
             .status(400)

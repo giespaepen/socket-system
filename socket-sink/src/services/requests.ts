@@ -2,6 +2,12 @@ import { Request } from "express";
 
 import { logger } from "../logging";
 
+
+/**
+ * Extract
+ * @param request
+ * @param pathVariable
+ */
 export function extractPathVariable(request: Request, pathVariable: string): string {
     const value = request.params[pathVariable];
     if (value) {

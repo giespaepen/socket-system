@@ -14,12 +14,11 @@ export function successResponse(message = "Request processed") {
     };
 }
 
-export function failResponse(e: Error) {
-    logger.error(`Request failed: ${e.message}`);
-    logger.debug(e);
+export function failResponse(message: string) {
+    logger.error(`Request failed: ${message}`);
 
     return {
-        message: e.message,
+        message,
         success: false,
         time: new Date(),
     };

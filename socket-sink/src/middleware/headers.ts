@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import os from "os";
 
-const hostname = os.hostname();
+import { config } from "../config";
 
 export function allowOrigin(req: Request, res: Response, next: NextFunction) {
     res.set("Access-Control-Allow-Headers", "*");
@@ -9,6 +8,6 @@ export function allowOrigin(req: Request, res: Response, next: NextFunction) {
 }
 
 export function serverName(req: Request, res: Response, next: NextFunction) {
-    res.set("Server", hostname);
+    res.set("Server", config.hostname);
     next();
 }

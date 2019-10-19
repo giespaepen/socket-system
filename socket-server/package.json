@@ -14,10 +14,12 @@
   "devDependencies": {
     "@types/redis": "^2.8.14",
     "@types/ws": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint": "^6.5.1",
     "nodemon": "^1.19.3",
-    "tslint": "^5.20.0",
-    "typescript": "^3.6.4",
-    "socket-common": "file:../socket-common"
+    "socket-common": "file:../socket-common",
+    "typescript": "^3.6.4"
   },
   "dependencies": {
     "redis": "^2.8.0",

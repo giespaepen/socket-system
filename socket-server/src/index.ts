@@ -1,25 +1,12 @@
-import http, { IncomingMessage } from "http";
-import { Socket } from "net";
+import http from "http";
 import { interval } from "rxjs";
 import { createRedisClient } from "socket-common";
 import WebSocket from "ws";
 
 import { config } from "./config";
 import { logger } from "./logging";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import { upgradeConnectionHandlerFactory } from "./services/http";
+import { popMessage } from "./services/redis";
 
 
 // Instantiate the http server
@@ -32,57 +19,27 @@ const socketServer = new WebSocket.Server({ noServer: true });
 const redisClient = createRedisClient(config, logger);
 
 // Handle the upgrade logic
-httpServer.on("upgrade", (request: IncomingMessage, socket: Socket, head: Buffer) => {
-    logger.debug(`Trying to upgrade: ${request.url}`);
-
-    // Get the session id
-    const { url } = request;
-    const sessionid = (url || "").split("/").pop();
-
-    if (sessionid && sessionid.length > 0) {
-        logger.info(`Creating socket for id ${sessionid}`);
-        socketServer.handleUpgrade(request, socket, head, (connection) => {
-            logger.debug(`Requesting connection on ${sessionid}`);
-            // Set the sessionid in the connection
-            connection.url = sessionid;
-
-            // Emit the connection
-            socketServer.emit("connection", connection, request);
-        });
-    } else {
-        logger.warn("No valid session id found, closing connection");
-        socket.destroy();
-    }
-});
+httpServer.on("upgrade", upgradeConnectionHandlerFactory(socketServer));
 
 // Handle the connection logic
 socketServer.on("connection", (connection) => {
     const sessionid = connection.url;
     logger.info(`Connected on id ${sessionid}`);
 
-    // Send a ping message each second, TODO: implement pong
+    // Send a ping message each second, TODO: implement pong receive mechanism
     interval(10000).subscribe(() => connection.ping(() => { logger.debug("Ping"); }));
 
     let alive = true;
 
-    // The internal loop function
-    function pop() {
-        redisClient.blpop([sessionid, 0], (list, item) => {
+    // Wrapper of the pop function
+    const pop = () => {
+        popMessage(sessionid, connection.send);
 
-            if (item && item.length === 2) {
-                logger.debug(`Relaying value from ${sessionid}`);
-                const value = item.pop();
-                connection.send(value);
-            } else {
-                logger.warn(`Empty value received on ${sessionid}`);
-            }
-
-            // Loop
-            if (alive) {
-                process.nextTick(pop);
-            }
-        });
-    }
+        // Loop
+        if (alive) {
+            process.nextTick(pop);
+        }
+    };
 
     // Start listening on redis
     logger.info("Start listening on redis");
