@@ -1,6 +1,6 @@
 {
   "name": "socket-common",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Common code for the socket system",
   "main": "dist/index.js",
   "scripts": {

@@ -1,6 +1,6 @@
 {
   "name": "socket-server",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Small socket service to dispatch socket messages",
   "main": "dist/index.js",
   "scripts": {
