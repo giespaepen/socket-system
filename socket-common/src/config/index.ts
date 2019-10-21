@@ -23,9 +23,9 @@ export interface IRedisConfig {
  * @param defaultApi
  */
 const createConfig = (
-    defaultName: string = "app",
-    defaultPort: number = 3000,
-    defaultEnvironment: string = "development",
+    defaultName = "app",
+    defaultPort = 3000,
+    defaultEnvironment = "development",
     defaultApi: ApiVersion = "v1"): ICommonConfig => {
     return {
         // Base configuration

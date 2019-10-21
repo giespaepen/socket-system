@@ -15,9 +15,6 @@ const httpServer = http.createServer();
 // Instantiate the socket server
 const socketServer = new WebSocket.Server({ noServer: true });
 
-// Instantiate the redis client
-const redisClient = createRedisClient(config, logger);
-
 // Handle the upgrade logic
 httpServer.on("upgrade", upgradeConnectionHandlerFactory(socketServer));
 
@@ -26,14 +23,35 @@ socketServer.on("connection", (connection) => {
     const sessionid = connection.url;
     logger.info(`Connected on id ${sessionid}`);
 
-    // Send a ping message each second, TODO: implement pong receive mechanism
-    interval(10000).subscribe(() => connection.ping(() => { logger.debug("Ping"); }));
-
     let alive = true;
 
+    // Send a ping message each second
+    interval(10000).subscribe(() => connection.ping(sessionid));
+
+    let timerId: NodeJS.Timeout | undefined = undefined;
+    connection.on("pong", () => {
+        if (timerId) clearTimeout(timerId);
+        timerId = setTimeout(() => {
+            alive = false;
+            connection.close();
+        }, 1000 * 60);
+    })
+
+    // Create a new client
+    const client = createRedisClient(config, logger);
+
     // Wrapper of the pop function
-    const pop = () => {
-        popMessage(sessionid, connection.send);
+    async function pop(): Promise<void> {
+        try {
+            const message = await popMessage(sessionid, client);
+            if (message) {
+                connection.send(message);
+            }
+        } catch (e) {
+            logger.error(`Error occurred while popping messages, ${e}`);
+            alive = false;
+            connection.close(500, e);
+        }
 
         // Loop
         if (alive) {

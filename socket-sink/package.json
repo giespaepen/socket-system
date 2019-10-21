@@ -4,6 +4,7 @@
   "description": "Small sink service to dispatch socket messages",
   "main": "dist/index.js",
   "scripts": {
+    "lint": "tsc --noEmit && eslint 'src/**/*.{ts,tsx}' --quiet --fix",
     "build:dev": "tsc",
     "build:watch": "tsc -w",
     "start:dev": "npx concurrently --kill-others \"tsc -w\" \"nodemon --watch dist dist/index.js\"",

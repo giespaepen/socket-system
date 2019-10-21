@@ -4,6 +4,7 @@
   "description": "Common code for the socket system",
   "main": "dist/index.js",
   "scripts": {
+    "lint": "tsc --noEmit && eslint 'src/**/*.{ts,tsx}' --quiet --fix",
     "build:dev": "tsc",
     "build:watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,8 +14,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/redis": "^2.8.14",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint": "^6.5.1",
     "nodemon": "^1.19.3",
-    "tslint": "^5.20.0",
     "typescript": "^3.6.4"
   },
   "dependencies": {

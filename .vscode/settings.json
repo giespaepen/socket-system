@@ -16,5 +16,22 @@
             "language": "typescriptreact",
             "autoFix": true
         }
+    ],
+    "eslint.enable": true,
+    "eslint.autoFixOnSave": true,
+    "eslint.alwaysShowStatus": true,
+    "eslint.workingDirectories": [
+        {
+            "directory": "./socket-server",
+            "changeProcessCWD": true
+        },
+        {
+            "directory": "./socket-sink",
+            "changeProcessCWD": true
+        },
+        {
+            "directory": "./socket-common",
+            "changeProcessCWD": true
+        },
     ]
 }

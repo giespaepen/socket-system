@@ -1,21 +1,32 @@
-import { createRedisClient } from "socket-common";
+import { RedisClient } from "socket-common/node_modules/@types/redis";
 
-import { config } from "../config";
 import { logger } from "../logging";
 
-export type PopCallback = (value: string) => void;
+/**
+ * 
+ * @param sessionid 
+ */
+export async function popMessage(sessionid: string, client: RedisClient): Promise<string> {
+    return new Promise((resolve, reject) => {
+        client.brpop(sessionid, 0, (error, item) => {
 
-// Instantiate the redis client
-const redisClient = createRedisClient(config, logger);
+            if (error) {
+                reject(error);
+            }
 
-export function popMessage(sessionid: string, callback: PopCallback) {
-    redisClient.blpop([sessionid, 0], (list, item) => {
-        if (item && item.length === 2) {
-            logger.debug(`Relaying value from ${sessionid}`);
-            const [_, message] = item;
-            callback(message);
-        } else {
-            logger.warn(`Empty value received on ${sessionid}`);
-        }
+            if (item && item.length === 2) {
+                logger.debug(`Relaying value from ${sessionid}`);
+                const message = item.pop();
+                if (message) {
+                    resolve(message);
+                } else {
+                    logger.warn(`Null value received on ${sessionid}`)
+                    resolve(undefined);
+                }
+            } else {
+                logger.warn(`Empty value received on ${sessionid}`);
+                resolve(undefined);
+            }
+        });
     });
 }
