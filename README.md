@@ -49,3 +49,11 @@ ws://<host>:<port>/:sessionid
 ```
 
 Messages are popped from the list and delivered. This service is based on the WS package and also runs on NodeJS. 
+
+# Development
+## Common
+The package `socket-common` contains the common functions and objects for both sink and server. Code stuff and run `npm run build:dev`. 
+To use it in socket and server run `npm i` in those components folders.
+
+## Components
+You can easily run it. First fire up the `docker-compose.yml` which starts a redis and a redis-commander. Individual components (sink and server) can be started with `npm run start:dev`.
